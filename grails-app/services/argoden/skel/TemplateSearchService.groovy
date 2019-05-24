@@ -27,7 +27,11 @@ class TemplateSearchService {
         def templates = CodeTemplate.findAllByOwner(owner)
         templates += sharedTemplates
 
-        templates*.name.join(System.lineSeparator())
+        def rtn = []
+        templates.each { template ->
+            rtn << "${template.category}\t${template.name}"
+        }
+        rtn.join(System.lineSeparator()) << System.lineSeparator()
     }
 
     def listAllTemplates(owner) {
@@ -35,7 +39,7 @@ class TemplateSearchService {
         def templates = CodeTemplate.findAllByOwner(owner)
         templates += sharedTemplates
 
-        templates*.name.join(System.lineSeparator())
+        templates*.name.join(System.lineSeparator()) << System.lineSeparator()
     }
 
     def listTemplatesByCategory(category, owner) {
@@ -43,6 +47,6 @@ class TemplateSearchService {
         def templates = CodeTemplate.findAllByCategoryAndOwner(category, owner)
         templates += sharedTemplates
 
-        templates*.name.join(System.lineSeparator())
+        templates*.name.join(System.lineSeparator()) << System.lineSeparator()
     }
 }
