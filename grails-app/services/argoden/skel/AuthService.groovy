@@ -5,20 +5,20 @@ import argoden.encrypt.EncryptionUtility
 import java.security.SecureRandom
 import java.text.SimpleDateFormat
 
-
+@SuppressWarnings('UnusedPrivateMethod')
 class AuthService {
 
     static transactional = false
 
     def random = new SecureRandom()
-    def tokenFormat = new SimpleDateFormat("yyyyMMddHHmmss")
+    // todo: replace with LocalDate
+    def tokenFormat = new SimpleDateFormat('yyyyMMddHHmmss', Locale.ENGLISH)
 
     def authenticateUser(username, password) {
         def user = getActiveUser(username)
         if (EncryptionUtility.decryptText(user?.password) == password) {
             return user
         }
-        return false
     }
 
     def getActiveUser(username) {
@@ -38,7 +38,7 @@ class AuthService {
             token = new UserToken(owner: skelUser, token: generateToken(), lastUsed: new Date())
             token.save()
         }
-        return token
+        token
     }
 
     // todo: why not validate by instance comparison?
@@ -46,7 +46,7 @@ class AuthService {
         if (tokenStr && tokenStr.size() == 24) {
             def token = UserToken.findByToken(tokenStr)
             if (token?.owner?.username == username) {
-                return token
+                token
             }
         }
     }

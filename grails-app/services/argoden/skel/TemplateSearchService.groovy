@@ -7,44 +7,35 @@ class TemplateSearchService {
     def loadSingleTemplate(owner, templateName) {
         if (owner && templateName) {
             def rtn = loadTemplateByOwner(owner, templateName)
-            if (!rtn) {
-                rtn = loadSharedTemplate(templateName)
-            }
-            return rtn ?: "Error: template not found\n"
+            rtn = rtn ?: this.loadSharedTemplate(templateName)
+            rtn ?: 'Error: template not found\n'
         }
     }
 
     def loadSharedTemplate(templateName) {
         def tmp = CodeTemplate.findByOwnerAndNameAndActive(null, templateName, true)
-        return tmp?.template
+        tmp?.template
     }
 
     def loadTemplateByOwner(owner, templateName) {
         def tmp = CodeTemplate.findByOwnerAndNameAndActive(owner, templateName, true)
-        return tmp?.template
+        tmp?.template
     }
 
     def listAllTemplatesWithDetails(owner) {
         def sharedTemplates = CodeTemplate.findAllByOwner(null)
         def templates = CodeTemplate.findAllByOwner(owner)
         templates += sharedTemplates
-        def rtn = ''
-        templates.each { template ->
-            rtn += "${template.category}\t${template.name}\n"
-        }
-        return rtn
+
+        templates*.name.join(System.lineSeparator())
     }
 
     def listAllTemplates(owner) {
         def sharedTemplates = CodeTemplate.findAllByOwner(null)
         def templates = CodeTemplate.findAllByOwner(owner)
         templates += sharedTemplates
-        def templateNames = templates.collect { it.name }
-        def rtn = ''
-        templateNames.each { name ->
-            rtn += name + '\n'
-        }
-        return rtn
+
+        templates*.name.join(System.lineSeparator())
     }
 
     def listTemplatesByCategory(category, owner) {
@@ -52,12 +43,6 @@ class TemplateSearchService {
         def templates = CodeTemplate.findAllByCategoryAndOwner(category, owner)
         templates += sharedTemplates
 
-        def templateNames = templates.collect { it.name }
-        def rtn = ''
-        templateNames.each { name ->
-            rtn += name + '\n'
-        }
-        return rtn
+        templates*.name.join(System.lineSeparator())
     }
-
 }

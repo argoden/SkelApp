@@ -2,6 +2,7 @@ package argoden.skel
 
 import argoden.encrypt.EncryptionUtility
 
+@SuppressWarnings('CatchException')
 class SkelUser {
 
     static transients = ['newPassword', 'passwordChanged', 'rolesFlattened']
@@ -24,13 +25,12 @@ class SkelUser {
 
     static constraints = {
         username(unique: true)
-        firstName(nullable:true)
-        lastName(blank:false)
-        lastLogin(nullable:true)
-        lastUpdated(nullable:true)
+        firstName(nullable: true)
+        lastName(blank: false)
+        lastLogin(nullable: true)
+        lastUpdated(nullable: true)
         lang(maxSize: 3, nullable: true)
     }
-
 
     static mapping = {
         cache true
@@ -38,18 +38,14 @@ class SkelUser {
         email index: 'idxUserEmail'
     }
 
-    public String toString() {
-        return "${username} ${lastName}, ${firstName}"
+    String toString() {
+       "$username $lastName, $firstName"
     }
 
     def beforeUpdate() {
         lastUpdated = new Date()
         try {
-            //check if password changed
-            if (this.dirtyPropertyNames?.contains('password'))
-                passwordChanged = true
-            def tmpPassword = EncryptionUtility.decryptText(password)
-
+            EncryptionUtility.decryptText(password)
         } catch (Exception e) {
             password = EncryptionUtility.encryptText(password)
         }
@@ -59,7 +55,7 @@ class SkelUser {
         dateCreated = new Date()
         lastUpdated = new Date()
         try {
-            def tmpPassword = EncryptionUtility.decryptText(password)
+            EncryptionUtility.decryptText(password)
         } catch (Exception e) {
             password = EncryptionUtility.encryptText(password)
         }
