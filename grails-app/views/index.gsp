@@ -1,77 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-    <meta name="layout" content="main"/>
-    <title>Welcome to Grails</title>
+    <title>Application Versions</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </head>
 <body>
-    <content tag="nav">
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Application Status <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-                <li><a href="#">Environment: ${grails.util.Environment.current.name}</a></li>
-                <li><a href="#">App profile: ${grailsApplication.config.grails?.profile}</a></li>
-                <li><a href="#">App version:
-                    <g:meta name="info.app.version"/></a>
-                </li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Grails version:
-                    <g:meta name="info.app.grailsVersion"/></a>
-                </li>
-                <li><a href="#">Groovy version: ${GroovySystem.getVersion()}</a></li>
-                <li><a href="#">JVM version: ${System.getProperty('java.version')}</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Reloading active: ${grails.util.Environment.reloadingAgentEnabled}</a></li>
-            </ul>
-        </li>
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Artefacts <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-                <li><a href="#">Controllers: ${grailsApplication.controllerClasses.size()}</a></li>
-                <li><a href="#">Domains: ${grailsApplication.domainClasses.size()}</a></li>
-                <li><a href="#">Services: ${grailsApplication.serviceClasses.size()}</a></li>
-                <li><a href="#">Tag Libraries: ${grailsApplication.tagLibClasses.size()}</a></li>
-            </ul>
-        </li>
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Installed Plugins <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-                <g:each var="plugin" in="${applicationContext.getBean('pluginManager').allPlugins}">
-                    <li><a href="#">${plugin.name} - ${plugin.version}</a></li>
-                </g:each>
-            </ul>
-        </li>
-    </content>
 
-    <div class="svg" role="presentation">
-        <div class="grails-logo-container">
-            <asset:image src="grails-cupsonly-logo-white.svg" class="grails-logo"/>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <h1><g:meta name="info.app.name"/></h1>
+            <ul class="list-group">
+                <li class="list-group-item active"><b>App name:</b> <g:meta name="info.app.name"/></li>
+                <li class="list-group-item"><b>App version:</b> <g:meta name="info.app.version"/> </li>
+                <li class="list-group-item"><b>Environment:</b> ${grails.util.Environment.current.name}</li>
+                <li class="list-group-item"><b>App profile:</b> ${grailsApplication.config.grails?.profile}</li>
+                <li class="list-group-item"><b>Grails version:</b> <g:meta name="info.app.grailsVersion"/></li>
+
+                <li class="list-group-item"><b>Groovy version:</b> ${GroovySystem.getVersion()}</li>
+                <li class="list-group-item"><b>JVM version:</b> ${System.getProperty('java.version')}</li>
+                <li class="list-group-item"><b>Reloading active:</b> ${grails.util.Environment.reloadingAgentEnabled}</li>
+                <%--
+                <li class="list-group-item"><b>Controllers:</b> ${grailsApplication.controllerClasses.size()}</li>
+                <li class="list-group-item"><b>Domains:</b> ${grailsApplication.domainClasses.size()}</li>
+                <li class="list-group-item"><b>Services:</b> ${grailsApplication.serviceClasses.size()}</li>
+                <li class="list-group-item"><b>Tag Libraries:</b> ${grailsApplication.tagLibClasses.size()}</li>
+                --%>
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <h1>Installed Plugins</h1>
+            <table class="table table-striped">
+                <tbody>
+                <g:each var="plugin" in="${applicationContext.getBean('pluginManager').allPlugins.sort{it.name}}">
+                    <tr>
+                        <td>${plugin.name}</td>
+                        <td>${plugin.version}</td>
+                    </tr>
+                </g:each>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            &nbsp;
         </div>
     </div>
-
-    <div id="content" role="main">
-        <section class="row colset-2-its">
-            <h1>Welcome to Grails</h1>
-
-            <p>
-                Congratulations, you have successfully started your first Grails application! At the moment
-                this is the default page, feel free to modify it to either redirect to a controller or display
-                whatever content you may choose. Below is a list of controllers that are currently deployed in
-                this application, click on each to execute its default action:
-            </p>
-
-            <div id="controllers" role="navigation">
-                <h2>Available Controllers:</h2>
-                <ul>
-                    <g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-                        <li class="controller">
-                            <g:link controller="${c.logicalPropertyName}">${c.fullName}</g:link>
-                        </li>
-                    </g:each>
-                </ul>
-            </div>
-        </section>
-    </div>
-
+</div>
 </body>
 </html>
