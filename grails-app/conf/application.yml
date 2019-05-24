@@ -111,7 +111,7 @@ dataSource:
 environments:
     development:
         dataSource:
-            dbCreate: create
+            dbCreate: update
             url: jdbc:mysql://localhost:3306/skel_dev?v?zeroDateTimeBehavior=convertToNull&autoReconnect=true&characterEncoding=UTF-8&characterSetResults=UTF-8
             username: bric_user
             password: bric_user
