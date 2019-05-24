@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+Y='\033[0;33m' # Yellow
+NC='\033[0m' # No Color
+
+SET_FLAG=true
+VERSION=latest
+
+usage() {
+printf "${Y}| ${0} is an awesome tool!${NC}\n"
+printf "${Y}| -v, --version${NC} Gets particular image version. Defaults to ${Y}$VERSION${NC} if not specified.\n"
+printf "${Y}| -n, --no_queue${NC} Skips initiation. Defaults to ${Y}$SET_FLAG${NC} if not specified.${NC}\n"
+printf "${Y}| -h, --help${NC} Displays this help.${NC}\n"
+exit
+}
+
+for arg
+do
+    delim=""
+    case "$arg" in
+       --help) args="${args}-h ";;
+       --version) args="${args}-v ";;
+       --no_queue) args="${args}-n ";;
+       # pass through anything else
+       *) [[ "${arg:0:1}" == "-" ]] || delim="\""
+           args="${args}${delim}${arg}${delim} ";;
+    esac
+done
+# reset the translated args
+eval set -- $args
+# now we can process with getopt
+while getopts ":hv:n" opt; do
+    case $opt in
+        h)  usage ;;
+        v)  VERSION=$OPTARG ;;
+        n)  SET_FLAG=false ;;
+        \?) exit ;;
+        :)
+        printf "${Y}| Error:${NC} Option ${Y}-$OPTARG${NC} requires an argument${NC}\n"
+        exit
+        ;;
+    esac
+done
+
+printf "${Y}| ${0}${NC} Version: ${Y}$VERSION${NC} | SET_FLAG ${Y}$SET_FLAG${NC}\n"

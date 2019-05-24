@@ -1,0 +1,75 @@
+
+
+//
+// globals that need to be set
+//
+// Symb 
+// orderTypeIndex 
+// Ask
+// Bid
+// Slippage
+// Risk
+// lableArrayRes[]
+// posCount
+//
+
+int openPosition (int cmd, double TP, double SL)
+{        
+   double   Min_Dist   = MarketInfo(Symb,MODE_STOPLEVEL)/1000;
+   double   Min_Lot    = MarketInfo(Symb,MODE_MINLOT);
+   double   Step       = MarketInfo(Symb,MODE_LOTSTEP);
+   double   Free       = AccountFreeMargin();      
+   double   One_Lot    = MarketInfo(Symb,MODE_MARGINREQUIRED);      
+   double   Lot        = MathFloor(Free*Risk/One_Lot/Step)*Step;      
+   int      ticket     = 0;
+   string   comment    = "";
+   int      magic      = 0;
+   datetime expire     = 0;
+   color    arrow      = CLR_NONE;
+   double   openPrice;
+
+if ((cmd == OP_BUY) || (cmd == OP_SELL))
+    {
+    if (Lot<Min_Lot)                          
+         {
+         Print(" Not enough money for ", Min_Lot," lots");
+         return(ticket);                               
+         }
+        
+    if (cmd == OP_BUY) // BUY   
+        {
+        openPrice = Ask;
+        }
+    else               // SELL
+        {
+        openPrice = Bid;
+        }                   
+
+    posCount++;
+    magic  = posCount;
+
+    ticket = OrderSend(Symb, cmd, Lot, openPrice, 5lippage, SL, TP,
+                       comment, magic, expire, arrow_color);
+
+    if (ticket>0)                         
+        {  
+        labelArrayRes[4] = posCount;        
+        return(ticket);
+        }
+    else
+        {
+            int Error = GetLastError();
+
+        if ((Error > 0) && (Error != 146 ))
+            {
+            Print (errorCodeDesc[Error]);  
+            return(ticket);                                       
+            }
+        }
+    }
+
+return(ticket);                                      
+}
+
+
+

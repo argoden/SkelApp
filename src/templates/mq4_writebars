@@ -1,0 +1,20 @@
+
+
+int bars_count=Bars;
+string ofilename = "mydat.cvs";
+
+int handle=FileOpen(ofilename,FILE_CSV|FILE_WRITE);
+
+if (handle>0)
+    {
+    FileWrite(handle, "#","OPEN","CLOSE","HIGH","LOW");
+    for(int i=0;i<bars_count;i++)
+       FileWrite(handle, i+1,Open[i],Close[i],High[i], Low[i]);
+
+    FileFlush(handle);
+    FileClose(handle);
+    }
+
+
+
+

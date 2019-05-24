@@ -1,0 +1,52 @@
+
+
+
+
+
+//tick= 20281683 ; datetime= 2012.06.29 22:57:14 ; bid= 79.896 ; ask= 79.918 ; digits= 3 ;
+
+
+int last_tick()
+{
+    string tok;
+    string tmp;
+    int    rfd;
+    int    fsize;
+    string QUOTE_OUTFILE = "quote_output.dat";
+    int    pos;
+    int    Tick;
+
+rfd   = FileOpen(QUOTE_OUTFILE, FILE_CSV|FILE_READ," ");
+fsize = FileSize(rfd); // returns the filesize in bytes
+
+pos = 0;
+if (fsize > 1024)
+    {
+    pos = fsize - 512;
+    }
+
+FileSeek(rfd, pos, SEEK_SET);
+
+// get the last tick in the file
+while (FileIsEnding(rfd) == false)
+    {
+    tok = FileReadString(rfd);
+    
+    if (tok == "tick=")
+        {
+        tmp  = FileReadString(rfd);
+        Tick = StrToInteger(tmp);
+        }
+
+
+    if (FileIsEnding(rfd) == true)
+        break;
+    }
+
+Alert("cur Tick=",Tick);
+FileClose(rfd);
+
+return Tick;
+}
+
+

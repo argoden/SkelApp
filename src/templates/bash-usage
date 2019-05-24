@@ -1,0 +1,13 @@
+#!/usr/bin/env bash      
+Y='\033[0;33m' # Yellow
+NC='\033[0m'   # No Color
+
+usage() {
+printf "${Y}| ${0} is an awesome tool!${NC}\n"
+exit
+}
+
+if [ -z "$1" ]; then
+usage
+exit
+fi

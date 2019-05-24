@@ -2,7 +2,7 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
-        maven { url "http://argoden.com:82/repository/published" }
+        maven { url "http://argoden.com:82/repository/unstable" }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
@@ -10,6 +10,8 @@ buildscript {
         classpath "gradle.plugin.com.energizedwork:idea-gradle-plugins:1.4"
         classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.14.6"
+        classpath "net.saliman:gradle-cobertura-plugin:2.5.3"
+        classpath 'org.codenarc:CodeNarc:1.1'
     }
 }
 
@@ -24,12 +26,14 @@ apply plugin:"com.energizedwork.webdriver-binaries"
 apply plugin:"com.energizedwork.idea-project-components"
 apply plugin:"asset-pipeline"
 apply plugin:"org.grails.grails-gsp"
+apply plugin: "codenarc"
+apply plugin: "net.saliman.cobertura"
 
 repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
     maven {
-        url "http://nexus.argoden.com:82/repository/published/"
+        url "http://nexus.argoden.com:82/repository/unstable/"
         credentials {
             username "$argodenUser"
             password "$argodenPassword"
@@ -76,8 +80,8 @@ dependencies {
     compile 'org.grails.plugins:grails-console:2.1.1'
     runtime 'mysql:mysql-connector-java:5.1.33'
 
-    compile "com.argoden.plugins:SeedPlugin:0.1.0"
-    compile "com.argoden.plugins:EncryptPlugin:0.1.0"
+    compile "com.argoden.plugins:SeedPlugin:0.0.1"
+    compile "com.argoden.plugins:EncryptPlugin:0.0.1"
 }
 
 bootRun {
@@ -94,6 +98,28 @@ tasks.withType(Test) {
     systemProperty "geb.env", System.getProperty('geb.env')
     systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
     systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
+}
+
+cobertura {
+    coverageFormats = ['html', 'xml']
+    // Exclude grails framework files
+    coverageExcludes = ['.*.Application.*','.*.BootStrap.*','.*.UrlMappings.*', '.*GrailsPlugin.*']
+}
+
+codenarcMain {
+    configFile = file("$project.projectDir/src/codenarc/main.groovy")
+    ignoreFailures = false
+    excludes = ['**/Application.*','**/BootStrap.*','**/UrlMappings.*', '**/GrailsPlugin.*']
+}
+
+codenarcTest {
+    configFile = file("$project.projectDir/src/codenarc/test.groovy")
+    ignoreFailures = false
+}
+
+codenarcIntegrationTest {
+    configFile = file("$project.projectDir/src/codenarc/test.groovy")
+    ignoreFailures = false
 }
 
 assets {

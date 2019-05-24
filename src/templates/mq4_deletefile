@@ -1,0 +1,17 @@
+
+
+// file my_table.csv will be deleted from terminal_dir\experts\files directory
+
+int lastError;
+string filename = "my_table.cvs";
+
+FileDelete(filename);
+
+lastError=GetLastError();
+if (laseError!=ERR_NOERROR)
+    {
+    Print("error (",lastError,") ocurred while deleting file ",filename);
+    return(0);
+    }
+
+
