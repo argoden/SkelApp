@@ -1,3 +1,5 @@
+package seed
+println "Running User seed"
 seed = {
 
 	def dt = new Date()

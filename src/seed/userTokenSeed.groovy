@@ -1,3 +1,7 @@
+package seed
+
+println "Running userToken seed"
+
 seed = {
     dependsOn(['userSeed'])
     def owner = [domainClass: 'skelUser', username: 'argoden']

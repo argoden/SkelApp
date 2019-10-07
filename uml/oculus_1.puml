@@ -1,0 +1,24 @@
+@startuml
+
+-> API : username / password
+
+API -> API: validates
+
+opt auth fails
+<-- API : error
+end
+
+API -> API : gets image data
+activate API
+API -> API : builds a packet
+
+API -> OCULUS : sends request to oculus
+
+OCULUS -> OCULUS : processes the image
+
+OCULUS -->> API: sends plate coordinates\nwith confidence
+
+
+deactivate API
+
+@enduml
