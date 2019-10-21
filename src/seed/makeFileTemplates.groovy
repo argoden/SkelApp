@@ -1,3 +1,7 @@
+package seed
+
+println "Running MakeFileTemplate seed"
+
 seed = {
     def category = 'makefile'
 /*

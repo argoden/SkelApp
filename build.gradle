@@ -1,3 +1,6 @@
+import com.bmuschko.gradle.docker.tasks.container.*
+import com.bmuschko.gradle.docker.tasks.image.*
+
 buildscript {
     repositories {
         mavenLocal()
@@ -12,6 +15,7 @@ buildscript {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.14.6"
         classpath "net.saliman:gradle-cobertura-plugin:2.5.3"
         classpath 'org.codenarc:CodeNarc:1.1'
+        classpath "com.bmuschko:gradle-docker-plugin:3.2.1"
     }
 }
 
@@ -20,7 +24,7 @@ group "skelapp"
 
 apply plugin:"eclipse"
 apply plugin:"idea"
-apply plugin:"war"
+//apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"com.energizedwork.webdriver-binaries"
 apply plugin:"com.energizedwork.idea-project-components"
@@ -28,6 +32,7 @@ apply plugin:"asset-pipeline"
 apply plugin:"org.grails.grails-gsp"
 apply plugin: "codenarc"
 apply plugin: "net.saliman.cobertura"
+apply plugin: "com.bmuschko.docker-remote-api"
 
 repositories {
     mavenLocal()
@@ -80,11 +85,12 @@ dependencies {
     compile 'org.grails.plugins:grails-console:2.1.1'
     runtime 'mysql:mysql-connector-java:5.1.33'
 
-    compile "com.argoden.plugins:SeedPlugin:0.0.1"
+    compile "com.argoden.plugins:SeedPlugin:0.0.2"
     compile "com.argoden.plugins:EncryptPlugin:0.0.1"
 }
 
 bootRun {
+    systemProperty 'server.port', '9900'
     jvmArgs('-Dspring.output.ansi.enabled=always')
     addResources = true
 }
@@ -125,4 +131,114 @@ codenarcIntegrationTest {
 assets {
     minifyJs = true
     minifyCss = true
+}
+
+// Docker
+
+docker {
+    registryCredentials {
+        url = "http://nexus.argoden.com:82/repository/develop/"
+        username = "$argodenUser"
+        password = "$argodenPassword"
+    }
+}
+
+ext {
+    dockerBuildDir = mkdir("${buildDir}/docker")
+    dockerImageName = "${project.name}".toLowerCase()
+    dockerLatestImageName = "$nexusRepository$dockerImageName".toLowerCase()
+    dockerLatestImageName = "$dockerImageName".toLowerCase()
+    dockerVersionImageName = "$dockerLatestImageName:${project.version}".toLowerCase()
+}
+
+task prepareSeed(type: Copy, dependsOn: assemble){
+    group = 'Docker'
+
+    from 'src/seed/'
+    into "$dockerBuildDir/seed"
+}
+
+
+task prepareBuild(type: Copy, dependsOn: prepareSeed) {
+    group = 'Docker'
+
+    from 'src/docker'
+    from project.jar
+
+    into dockerBuildDir
+}
+
+task buildImage(type: DockerBuildImage, dependsOn: prepareBuild) {
+    group = 'Docker'
+
+    inputDir = file(dockerBuildDir)
+    tags = [ dockerLatestImageName, dockerVersionImageName ]
+}
+
+task publishVersionImage(type: DockerPushImage, dependsOn: buildImage) {
+    group = 'Docker'
+
+    imageName = dockerVersionImageName
+}
+
+task publishLatestImage(type: DockerPushImage, dependsOn: publishVersionImage) {
+    group = 'Docker'
+
+    imageName = dockerLatestImageName
+}
+
+task removeImages(type: DockerListImages) {
+    group = 'Docker'
+
+    imageName = dockerVersionImageName
+
+    onNext { image ->
+
+        if (image.id) {
+            task remove(type: DockerRemoveImage) {
+                imageId = image.id[0] - 'sha256:'
+                force = true
+            }
+            tasks.remove.execute()
+        }
+    }
+}
+
+task createContainer(type: DockerCreateContainer) {
+    group = 'Docker'
+    env = ['GRAILS_ENV=docker']
+    imageId = dockerImageName
+    containerName = dockerImageName
+    hostName = dockerImageName
+    network = 'bric-tps'
+    portBindings = ['9900:80']
+}
+
+task startContainer(type: DockerStartContainer) {
+    group = 'Docker'
+    containerId = dockerImageName
+}
+
+task runContainer(type: GradleBuild) {
+    group = 'Docker'
+
+    tasks = ['createContainer', 'startContainer']
+}
+
+task stopContainer(type: DockerStopContainer) {
+    group = 'Docker'
+
+    containerId = dockerImageName
+}
+
+task killContainer(type: DockerKillContainer) {
+    group = 'Docker'
+
+    containerId = dockerImageName
+}
+
+task removeContainer(type: DockerRemoveContainer) {
+    group = 'Docker'
+
+    containerId = dockerImageName
 }

@@ -15,12 +15,16 @@ grails:
     plugin:
         seed:
             autoSeed: true
-            skipPlugins: false
-            excludedPlugins: [] # plugins to exclude
-            excludedSeedFiles: [] # Seed files to exclude
-            root: 'src/seed'
-            metaKey: 'meta' # seed map key for meta information
+#            skipPlugins: false
+#            excludedPlugins: [] # plugins to exclude
+#            excludedSeedFiles: [] # Seed files to exclude
+            root: 'seed'
+#            metaKey: 'meta' # seed map key for meta information
             #environment: ['development','special'] # environment is a directory in src/seed
+        console:
+            enabled: true
+            csrfProtection:
+                enabled: false
 info:
     app:
         name: '@info.app.name@'
@@ -101,12 +105,6 @@ hibernate:
         queries: false
         use_second_level_cache: false
         use_query_cache: false
-dataSource:
-    pooled: true
-    jmxExport: true
-    driverClassName: org.h2.Driver
-    username: sa
-    password: ''
 
 environments:
     development:
@@ -135,14 +133,14 @@ environments:
                 testOnReturn: false
                 jdbcInterceptors: ConnectionState
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
-    test:
+    docker:
         dataSource:
-            dbCreate: update
-            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-    production:
-        dataSource:
-            dbCreate: none
-            url: jdbc:h2:./prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+            dbCreate: create
+            url: jdbc:mysql://bricmysql:3306/skel_dev?useSSL=false&zeroDateTimeBehavior=convertToNull&autoReconnect=true&characterEncoding=UTF-8&characterSetResults=UTF-8
+            username: bric_user
+            password: bric_user
+            dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+            driverClassName: com.mysql.jdbc.Driver
             properties:
                 jmxEnabled: true
                 initialSize: 5
@@ -161,3 +159,4 @@ environments:
                 testOnReturn: false
                 jdbcInterceptors: ConnectionState
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+
