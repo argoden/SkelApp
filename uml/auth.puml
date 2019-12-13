@@ -1,0 +1,32 @@
+@startuml
+
+actor USER
+
+USER -> UI: Username/password
+UI -> AUTH: Validates username and password
+alt error
+AUTH -> UI: 401 Unauthorised
+end
+AUTH ->> UI: List of roles user belong to\nACCESS_TOKEN and REFRESH_TOKEN
+UI -> UI: Stores both tokes as cookies with expiration
+UI -> UI: redirects to default landing page
+
+USER -> UI: Another action
+UI -> UI: Reads cookies ans sets auth headers
+UI -> SERVICE: creates REQUEST to a service\nwith ACCESS_TOKEN
+
+SERVICE -> SERVICE : validates the JWT
+alt error
+SERVICE -> UI: 401 Unauthorised
+UI -> AUTH: token refresh request is send using\nREFRESH_TOKEN
+alt
+  AUTH -> UI: 401 Unauthorised
+  UI -> UI: Redirect to login
+end
+UI -> UI: updates ACCESS_TOKEN  in cookies
+UI -> SERVICE: repeats original REQUEST to a service\nwith new ACCESS_TOKEN
+end
+
+SERVICE ->> UI: 200 OK
+
+@enduml
